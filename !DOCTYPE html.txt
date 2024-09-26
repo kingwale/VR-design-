@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Headset Experience</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    #vrButton {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <button id="vrButton">Enter VR</button>
+  <canvas id="vrCanvas"></canvas>
+
+  <script>
+    let xrSession = null;
+    let xrCanvas = document.getElementById("vrCanvas");
+    let vrButton = document.getElementById("vrButton");
+
+    const canvasContext = xrCanvas.getContext("webgl", { xrCompatible: true });
+
+    // Initialize WebGL scene (a basic 3D cube)
+    function initWebGLScene() {
+      let cubeRotation = 0.0;
+      const cube = createCube();
+      
+      function render(timestamp) {
+        cubeRotation += 0.01;
+        drawCube(cube, cubeRotation);
+        if (xrSession) {
+          xrSession.requestAnimationFrame(render);
+        } else {
+          requestAnimationFrame(render);
+        }
+      }
+      
+      requestAnimationFrame(render);
+    }
+
+    // Create cube for VR environment
+    function createCube() {
+      // Your WebGL 3D cube setup (e.g., vertices, shaders, etc.)
+      // This is a placeholder and requires WebGL setup
+      return {};
+    }
+
+    function drawCube(cube, rotation) {
+      // Draw the cube based on its rotation and WebGL setup
+    }
+
+    async function startXRSession() {
+      if (navigator.xr) {
+        try {
+          xrSession = await navigator.xr.requestSession("immersive-vr");
+          xrSession.updateRenderState({
+            baseLayer: new XRWebGLLayer(xrSession, canvasContext),
+          });
+          xrSession.requestAnimationFrame(initWebGLScene);
+        } catch (err) {
+          console.log("Error starting XR session:", err);
+        }
+      } else {
+        alert("WebXR not supported in this browser.");
+      }
+    }
+
+    vrButton.addEventListener("click", startXRSession);
+  </script>
+</body>
+</html>
